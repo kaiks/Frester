@@ -9,7 +9,9 @@ It's a GUI based tester that let's you memorize things more easily.
 
 
 CSV file included is used in a following way:
+
 The first line is used as content of the question and will be displayed in a question label box every time
+
 The following lines are formatted in a following way:
 
 * field 1
