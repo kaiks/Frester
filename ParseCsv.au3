@@ -1,4 +1,10 @@
-;
+;Credit goes to Chris at stackoverflow:
+;http://stackoverflow.com/users/3083957/chris
+;http://stackoverflow.com/questions/19616963/autoit-parse-csv-columns-to-array
+
+;I did modify his version of this solution so that array[1][0] indicates first field of the first line
+;(before it was [1][1] and seemed buggy for me)
+
 ;params:
 ;    filename
 ;    delimeter
