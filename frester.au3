@@ -133,25 +133,31 @@ Func GenerateQuestion()
 EndFunc
 
 Func ProcessQuestion()
-	If BitAnd(GUICtrlGetState($Continue),$GUI_ENABLE) Then
-		GenerateQuestion()
-	Else
-		GUICTRLSetBkColor($Continue, 0x00FF00)
-		GUICtrlSetState ($Continue, $GUI_ENABLE)
-		if GuiCtrlRead($Input)==$answer Then
-			GUICtrlSetBkColor($Comments,0x00FF00)
-			$points = $points + 1
-			GuiCtrlSetData($Comments,"Correct! "&$points&" points! "&@CRLF&$comment)
-			;Sleep(3000)
-			;GenerateQuestion()
+	If WinActive("Frester","") Then
+		If BitAnd(GUICtrlGetState($Continue),$GUI_ENABLE) Then
+			GenerateQuestion()
 		Else
-			GUICTRLSetBkColor($Check, 0xF4F4F4)
-			GUICtrlSetState($Check, $GUI_DISABLE)
-			GUICTRLSetBkColor($Continue, 0xFF0000)
-			GUICtrlSetBkColor($Comments,0xFF0000)
-			$points = $points - 0.5
-			GuiCtrlSetData($Comments,"Wrong, -0.5 point. Correct answer: "&$answer&". "&@CRLF&$comment)
+			GUICTRLSetBkColor($Continue, 0x00FF00)
+			GUICtrlSetState ($Continue, $GUI_ENABLE)
+			if GuiCtrlRead($Input)==$answer Then
+				GUICtrlSetBkColor($Comments,0x00FF00)
+				$points = $points + 1
+				GuiCtrlSetData($Comments,"Correct! "&$points&" points! "&@CRLF&$comment)
+				;Sleep(3000)
+				;GenerateQuestion()
+			Else
+				GUICTRLSetBkColor($Check, 0xF4F4F4)
+				GUICtrlSetState($Check, $GUI_DISABLE)
+				GUICTRLSetBkColor($Continue, 0xFF0000)
+				GUICtrlSetBkColor($Comments,0xFF0000)
+				$points = $points - 0.5
+				GuiCtrlSetData($Comments,"Wrong, -0.5 point. Correct answer: "&$answer&". "&@CRLF&$comment)
+			EndIf
 		EndIf
+	Else
+		HotKeySet("{ENTER}")
+		Send("{Enter}")
+		HotKeySet("{ENTER}","ProcessQuestion")
 	EndIf
 EndFunc
 
