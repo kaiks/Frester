@@ -17,7 +17,6 @@ The following lines are formatted in a following way:
 * field 1
 * field 2
 * comment
-* 
 
 Field 1 and field 2 are used as either a question or an answer: if field 2 is randomly picked as the question, field 1 will be the answer.
 
