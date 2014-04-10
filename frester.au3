@@ -1,4 +1,6 @@
 #include "ParseCsv.au3"
+#include "draw.au3"
+#include "typo.au3"
 
 #include <ButtonConstants.au3>
 #include <EditConstants.au3>
@@ -6,48 +8,77 @@
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
 
+;Locales
+$checkLabel	= "Check"
+$exitLabel	= "Exit"
+$scoreLabel	= "Score: "
+$commentsLabel	= "Feedback"
+$continueLabel	= "Continue"
 
-$inputFile="input.csv"
+$typoLabel	= "Typo. 0.5 point. Correct answer: "
+$correctLabel	= "Correct! "
+$pointsLabel	= " points! "
+
+$wrongAnswerLabel = "Wrong. -0.5 point. Correct answer: "
+
+$badEncodingLabel = "Bad file encoding detected. Ensure that input.csv is encoded using UTF-8"
+$badDataLabel     = "Error during input data parsing"
+
+$fileLabel = "File "
+$dneLabel  = " doesn't exist."
+
+;
+
+
+$inputFile = "input.csv"
+
 AssertFileUtf($inputFile)
 
-Global $aRow = _ParseCsv($inputFile,",","Error parsing input file",1)
-$Exercise=FileReadLine($inputFile,1)
+Global $aRow	= _ParseCsv($inputFile,",",$badDataLabel,1)
+$descriptionLine = FileReadLine($inputFile,1)
+$descriptionInfo = StringSplit($descriptionLine, "|")
+$Exercise	= $descriptionInfo[1]
 
+AssignDefaultWeight($aRow)
 
 Global $RowCount = $aRow[0][0]
 
+Global $randomizeQA = $descriptionInfo[2]
 
-#Region ### START Koda GUI section ###
-$Form1 = GUICreate("Frester", 663, 266, 192, 124)
+
+
+#Region ### START Koda GUI section ### Form=F:\Programowanie\Autoit\Tester\v2_form.kxf
+$Form1 = GUICreate("Frester", 663, 320)
 GUISetFont(16, 400, 0, "Calibri")
-$Question = GUICtrlCreateLabel("Question", 16, 8, 505, 62)
-$Input = GUICtrlCreateEdit("", 16, 72, 633, 57, BitOR($ES_AUTOVSCROLL,$ES_AUTOHSCROLL,$ES_WANTRETURN))
+$Question = GUICtrlCreateLabel("Question", 16, 8, 521, 78)
+$Input = GUICtrlCreateEdit("", 16, 88, 633, 57, BitOR($ES_AUTOVSCROLL,$ES_AUTOHSCROLL,$ES_WANTRETURN))
 GUICtrlSetData(-1, "Input")
-$a1 = GUICtrlCreateButton("à", 16, 136, 28, 28)
-$a2 = GUICtrlCreateButton("â", 48, 136, 28, 28)
-$ae = GUICtrlCreateButton("æ", 80, 136, 28, 28)
-$e1 = GUICtrlCreateButton("è", 112, 136, 28, 28)
-$e2 = GUICtrlCreateButton("é", 144, 136, 28, 28)
-$e3 = GUICtrlCreateButton("ê", 176, 136, 28, 28)
-$e4 = GUICtrlCreateButton("ë", 208, 136, 28, 28)
-$i1 = GUICtrlCreateButton("î", 240, 136, 28, 28)
-$i2 = GUICtrlCreateButton("ï", 16, 168, 28, 28)
-$o1 = GUICtrlCreateButton("ô", 48, 168, 28, 28)
-$u1 = GUICtrlCreateButton("ù", 80, 168, 28, 28)
-$u2 = GUICtrlCreateButton("û", 112, 168, 28, 28)
-$u3 = GUICtrlCreateButton("ü", 144, 168, 28, 28)
-$c1 = GUICtrlCreateButton("ç", 176, 168, 28, 28)
-$oe = GUICtrlCreateButton("œ", 208, 168, 28, 28)
-$Check = GUICtrlCreateButton("Check", 440, 160, 97, 33)
+$a1 = GUICtrlCreateButton("à", 16, 152, 28, 28)
+$a2 = GUICtrlCreateButton("â", 48, 152, 28, 28)
+$ae = GUICtrlCreateButton("æ", 80, 152, 28, 28)
+$e1 = GUICtrlCreateButton("è", 112, 152, 28, 28)
+$e2 = GUICtrlCreateButton("é", 144, 152, 28, 28)
+$e3 = GUICtrlCreateButton("ê", 176, 152, 28, 28)
+$e4 = GUICtrlCreateButton("ë", 208, 152, 28, 28)
+$i1 = GUICtrlCreateButton("î", 240, 152, 28, 28)
+$i2 = GUICtrlCreateButton("ï", 16, 184, 28, 28)
+$o1 = GUICtrlCreateButton("ô", 48, 184, 28, 28)
+$u1 = GUICtrlCreateButton("ù", 80, 184, 28, 28)
+$u2 = GUICtrlCreateButton("û", 112, 184, 28, 28)
+$u3 = GUICtrlCreateButton("ü", 144, 184, 28, 28)
+$c1 = GUICtrlCreateButton("ç", 176, 184, 28, 28)
+$oe = GUICtrlCreateButton("œ", 208, 184, 28, 28)
+$Check = GUICtrlCreateButton($checkLabel, 440, 176, 97, 33)
 GUICtrlSetBkColor(-1, 0x00FF00)
-$Exit = GUICtrlCreateButton("Exit", 544, 224, 105, 33)
-$Score = GUICtrlCreateLabel("Score", 536, 8, 115, 62, $SS_RIGHT)
-$Comments = GUICtrlCreateLabel("Comments", 16, 200, 518, 58)
+$Exit = GUICtrlCreateButton($exitLabel, 544, 280, 105, 33)
+$Score = GUICtrlCreateLabel($scoreLabel, 552, 8, 99, 38, $SS_RIGHT)
+$Comments = GUICtrlCreateLabel($commentsLabel, 16, 216, 518, 93)
 GUICtrlSetBkColor(-1, 0xFFFFFF)
-$Continue = GUICtrlCreateButton("Continue", 544, 160, 107, 33)
+$Continue = GUICtrlCreateButton($continueLabel, 544, 176, 107, 33)
 GUICtrlSetState(-1, $GUI_DISABLE)
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
+
 
 HotKeySet("{ENTER}","ProcessQuestion")
 
@@ -110,10 +141,9 @@ Func InsertCharacter($character)
 EndFunc
 
 Func GenerateQuestion()
-	$Question_no = Random(0,$RowCount-1,1)+1
-	;_SQLite_QuerySingleRow(-1, "SELECT * FROM questions WHERE id="&$Question_no,$aRow)
+	$Question_no = DrawElementIndex($aRow)
 	
-	$t = Random(0,1,1)
+	$t = Random(0,$randomizeQA,1)
 	;MsgBox(0,@error,$Question&$aRow[1+$t])
 	$answer = $aRow[$Question_no][1-$t]
 	$comment = $aRow[$Question_no][2]
@@ -126,7 +156,7 @@ Func GenerateQuestion()
 	GUICtrlSetState($Continue, $GUI_DISABLE)
 	GuiCtrlSetBkColor($Continue, 0xE4E4E4)
 	
-	GuiCtrlSetData($Score,"Score: "&$points)
+	GuiCtrlSetData($Score,$scoreLabel&$points)
 	
 	GUICTRLSetBkColor($Check, 0x00FF00)
 	GUICtrlSetState($Check, $GUI_ENABLE)
@@ -137,21 +167,31 @@ Func ProcessQuestion()
 		If BitAnd(GUICtrlGetState($Continue),$GUI_ENABLE) Then
 			GenerateQuestion()
 		Else
+			$userAnswer = GuiCtrlRead($Input)
 			GUICTRLSetBkColor($Continue, 0x00FF00)
 			GUICtrlSetState ($Continue, $GUI_ENABLE)
-			if GuiCtrlRead($Input)==$answer Then
+			if $userAnswer==$answer Then
 				GUICtrlSetBkColor($Comments,0x00FF00)
 				$points = $points + 1
-				GuiCtrlSetData($Comments,"Correct! "&$points&" points! "&@CRLF&$comment)
+				GuiCtrlSetData($Comments,$correctLabel&$points&$pointsLabel&@CRLF&$comment)
+				UpdateElementWeight($aRow, $Question_no, 0.1)
 				;Sleep(3000)
 				;GenerateQuestion()
+			ElseIf isTypo($userAnswer,$answer) Then
+				GUICTRLSetBkColor($Check, 0xF4F4F4)
+				GUICtrlSetState($Check, $GUI_DISABLE)
+				GUICTRLSetBkColor($Continue, 0xFFFF00)
+				GUICtrlSetBkColor($Comments,0xFFFF00)
+				$points = $points + 0.5
+				GuiCtrlSetData($Comments,$typoLabel & $answer & ". " &@CRLF&$comment)
 			Else
 				GUICTRLSetBkColor($Check, 0xF4F4F4)
 				GUICtrlSetState($Check, $GUI_DISABLE)
 				GUICTRLSetBkColor($Continue, 0xFF0000)
 				GUICtrlSetBkColor($Comments,0xFF0000)
 				$points = $points - 0.5
-				GuiCtrlSetData($Comments,"Wrong, -0.5 point. Correct answer: "&$answer&". "&@CRLF&$comment)
+				GuiCtrlSetData($Comments,$wrongAnswerLabel & $answer&". "&@CRLF&$comment)
+				UpdateElementWeight($aRow, $Question_no, 5.0)
 			EndIf
 		EndIf
 	Else
@@ -163,12 +203,12 @@ EndFunc
 
 Func AssertFileUtf($file)
 	If (FileExists($file) == 0) Then
-		MsgBox(0x10,"","File "&$file&" does not exist")
+		MsgBox(0x10,"",$fileLabel&$file&$dneLabel)
 		Exit
 	Else
 		$fileFormat = FileGetEncoding($file)
 		if ($fileFormat <> 128 and $fileFormat <> 256) Then
-			MsgBox(0x10,"","Bad input file encoding detected. Please set it to UTF-8")
+			MsgBox(0x10,"",$badEncodingLabel)
 			Exit
 		EndIf
 	EndIf
