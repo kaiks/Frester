@@ -10,18 +10,16 @@ To use it, compile it and run, or just run as a script.
 It's a GUI based tester that let's you memorize things more easily.
 
 
-CSV file included is used in a following way:
+CSV file included is used in the following way:
 
-The first line is used as content of the question and will be displayed in a question label box every time. It also determines whether to vary question and answer (randomly switch between field 1 and field 2)
+The first line is used as exercise description and will be displayed in the question label box every time. This line also determines whether to vary question and answer (randomly switch between field 1 and field 2)
 
-The following lines are formatted in a following way:
+The lines after exercise description are formatted in the following way:
 
 * field 1
 * field 2
 * comment
 
-Field 1 and field 2 are used as either a question or an answer: if field 2 is randomly picked as the question, field 1 will be the answer.
+Field 1 and field 2 are used as either a question or an answer: if field 2 is randomly picked as a question, field 1 will be the answer.
 
-A comment is displayed after the user has decided to check his answer on the lower left region of the window.
-
-
+Content of the 'comment' field is displayed after the user has decided to check his answer in the lower left region of the window.
