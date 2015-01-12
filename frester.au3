@@ -7,6 +7,8 @@
 #include <GUIConstantsEx.au3>
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
+#include <WinAPI.au3>
+#include <GUIEdit.au3>
 
 ;Locales
 $checkLabel	= "Check"
@@ -53,6 +55,8 @@ GUISetFont(16, 400, 0, "Calibri")
 $Question = GUICtrlCreateLabel("Question", 16, 8, 521, 78)
 $Input = GUICtrlCreateEdit("", 16, 88, 633, 57, BitOR($ES_AUTOVSCROLL,$ES_AUTOHSCROLL,$ES_WANTRETURN))
 GUICtrlSetData(-1, "Input")
+$hInput_Handle = GUICtrlGetHandle(-1)
+$cSelAll = GUICtrlCreateDummy()
 $a1 = GUICtrlCreateButton("à", 16, 152, 28, 28)
 $a2 = GUICtrlCreateButton("â", 48, 152, 28, 28)
 $ae = GUICtrlCreateButton("æ", 80, 152, 28, 28)
@@ -79,6 +83,8 @@ GUICtrlSetState(-1, $GUI_DISABLE)
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
+Dim $aAccelKeys[1][2]=[["^a", $cSelAll]]
+GUISetAccelerators($aAccelKeys)
 
 HotKeySet("{ENTER}","ProcessQuestion")
 
@@ -95,6 +101,8 @@ While 1
 	Switch $nMsg
 		Case $GUI_EVENT_CLOSE
 			Exit
+		Case $cSelAll
+            _SelAll()
 		Case $Check
 			ProcessQuestion()
 		Case $Exit
@@ -134,6 +142,14 @@ While 1
 	EndSwitch
 WEnd
 
+Func _SelAll()
+    Switch _WinAPI_GetFocus()
+        Case $hInput_Handle
+            _GUICtrlEdit_SetSel($hInput_Handle, 0, -1)
+            Return
+    EndSwitch
+EndFunc   ;==>_SelAll
+
 Func InsertCharacter($character)
 	$CurrentInput = GuiCtrlRead($Input)
 	GuiCtrlSetState($Input,$GUI_FOCUS)
@@ -170,7 +186,7 @@ Func ProcessQuestion()
 			$userAnswer = GuiCtrlRead($Input)
 			GUICTRLSetBkColor($Continue, 0x00FF00)
 			GUICtrlSetState ($Continue, $GUI_ENABLE)
-			if $userAnswer==$answer Then
+			if EqualWithoutPolish($userAnswer,$answer) Then
 				GUICtrlSetBkColor($Comments,0x00FF00)
 				$points = $points + 1
 				GuiCtrlSetData($Comments,$correctLabel&$points&$pointsLabel&@CRLF&$comment)
